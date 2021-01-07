@@ -8,9 +8,10 @@ pub struct MIDIOutputMap {
 }
 
 impl MIDIOutputMap {
-    fn new(client: midir::MidiInput) -> Self {
-        let z = client.ports();
-        for e in 0..client.port_count() {}
+    pub(crate) fn new(client: MIDIClient) -> Self {
+        // let z = client.ports();
+        // for e in 0..client.port_count() {}
+        // todo!()
         todo!()
     }
 }

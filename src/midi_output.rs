@@ -4,6 +4,24 @@ use crate::{
     MIDIPortDeviceState,
     MIDIPortKind,
 };
+
+enum MIDIOutputImpl {
+    Port(midir::MidiOutputPort),
+    Connection(midir::MidiOutputConnection),
+}
+
+impl MIDIOutputImpl {
+    fn connect(mut self, port_name: &str, output: midir::MidiOutput) {
+        match self {
+            Self::Port(port) => {
+                let conn = output.connect(&port, port_name).unwrap();
+                self = Self::Connection(conn);
+            }
+            _ => { }
+        }
+    }
+}
+
 pub struct MIDIOutput {
     inner: midir::MidiOutput,
     connection: Option<midir::MidiOutputConnection>,
@@ -15,8 +33,12 @@ impl MIDIOutput {
     }
 
     // func send<S: Sequence>(_ data: S, offset: Timestamp = 0) -> MIDIOutput where S.Iterator.Element == UInt8
-    pub fn send(&self) {
+    pub fn send(&self, message: &[u8]) {
         todo!()
+    }
+
+    fn close(&mut self) {
+
     }
 }
 

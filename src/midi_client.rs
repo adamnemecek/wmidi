@@ -1,6 +1,12 @@
 use std::cell::RefCell;
 
-struct MIDIClientImpl {
+use crate::{
+    MIDIInputMap,
+    MIDIOutput,
+    MIDIOutputMap,
+};
+
+pub(crate) struct MIDIClientImpl {
     name: String,
     inputs: midir::MidiInput,
     outputs: midir::MidiOutput,
@@ -56,6 +62,7 @@ impl std::ops::DerefMut for MIDIClientImpl {
     }
 }
 
+#[derive(Clone)]
 pub(crate) struct MIDIClient {
     inner: std::rc::Rc<RefCell<MIDIClientImpl>>,
     // inner: std::pin::Pin<MIDIClientImpl>,
@@ -93,6 +100,15 @@ impl MIDIClient {
             .try_borrow_mut()
             .map(|mut x| x.connect_output(port, port_name))
             .unwrap()
+    }
+
+    pub fn inputs(&self) -> MIDIInputMap {
+        // MIDIInputMap::new(self.clone())
+        todo!()
+    }
+
+    pub fn outputs(&self) -> MIDIOutputMap {
+        MIDIOutputMap::new(self.clone())
     }
 
     // pub(crate) fn connect_output(
