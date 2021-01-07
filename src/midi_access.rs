@@ -8,6 +8,10 @@ pub struct MIDIAccess {
 }
 
 impl MIDIAccess {
+    // pub fn new() -> Self {
+    //     // Self {
+    //     // }
+    // }
     pub fn inputs(&self) -> &MIDIInputMap {
         &self.inputs
     }

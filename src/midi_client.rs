@@ -38,4 +38,10 @@ impl MIDIClient {
         // inputs.connect(port, port_name, callback, ());
         todo!()
     }
+
+    // pub(crate) fn connect_output(
+    //     &mut self,
+    // ) {
+    //     todo!()
+    // }
 }

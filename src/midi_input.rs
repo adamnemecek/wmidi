@@ -12,29 +12,36 @@ pub struct MIDIPacket {}
 unsafe impl Send for MIDIPacket {}
 unsafe impl Sync for MIDIPacket {}
 
-// type OnMIDIMessage = std::sync::Arc<dyn Fn(MIDIPacket) -> ()>;
+pub type OnMIDIMessage = std::sync::Arc<dyn Fn(MIDIPacket) -> ()>;
 #[derive(Clone)]
-pub struct OnMIDIMessage {
-    pub inner: std::sync::Arc<dyn Fn(MIDIPacket) -> ()>,
+struct OnMIDIMessageFn {
+    pub inner: OnMIDIMessage,
 }
 
-unsafe impl Send for OnMIDIMessage {}
-unsafe impl Sync for OnMIDIMessage {}
+
+impl OnMIDIMessageFn {
+    fn new(inner: OnMIDIMessage) -> Self {
+        Self { inner }
+    }
+}
+unsafe impl Send for OnMIDIMessageFn {}
+unsafe impl Sync for OnMIDIMessageFn {}
 pub struct MIDIInput {
     client: MIDIClient,
     inner: midir::MidiInput,
     connection: Option<midir::MidiInputConnection<()>>,
     // var onMIDIMessage: ((MIDIPacket) -> ())? = nil { get set }
-    on_midi_message: Option<OnMIDIMessage>,
+    on_midi_message: Option<OnMIDIMessageFn>,
 }
 
 impl MIDIInput {
-    fn new(client: MIDIClient, port: midir::MidiInput) -> Self {
+    fn new(client: MIDIClient, port: midir::MidiInputPort) -> Self {
         todo!()
     }
 
     pub fn set_on_midi_message(&mut self, on_midi_message: Option<OnMIDIMessage>) {
-        self.on_midi_message = on_midi_message;
+        self.on_midi_message = on_midi_message.map(OnMIDIMessageFn::new);
+        self.open();
     }
 }
 
