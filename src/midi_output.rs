@@ -6,7 +6,7 @@ use crate::{
 };
 pub struct MIDIOutput {
     inner: midir::MidiOutput,
-    connection: midir::MidiOutputConnection,
+    connection: Option<midir::MidiOutputConnection>,
 }
 
 impl MIDIOutput {
@@ -50,7 +50,11 @@ impl MIDIPort for MIDIOutput {
 
     /// .open | .closed
     fn connection(&self) -> MIDIPortConnectionState {
-        todo!()
+        if self.connection.is_none() {
+            MIDIPortConnectionState::Closed
+        } else {
+            MIDIPortConnectionState::Open
+        }
     }
 
     /// open the port, is called implicitly when MIDIInput's onMIDIMessage is set or MIDIOutputs' send is called
