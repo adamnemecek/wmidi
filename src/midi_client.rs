@@ -62,8 +62,10 @@ pub(crate) struct MIDIClient {
 }
 
 impl MIDIClient {
-    pub fn new() -> Self {
-        todo!()
+    pub fn new(name: &str) -> Self {
+        Self {
+            inner: std::rc::Rc::new(RefCell::new(MIDIClientImpl::new(name))),
+        }
     }
 
     pub(crate) fn connect_input<F>(
@@ -79,6 +81,17 @@ impl MIDIClient {
         self.inner
             .try_borrow_mut()
             .map(|mut x| x.connect_input(port, callback, port_name))
+            .unwrap()
+    }
+
+    fn connect_output(
+        &mut self,
+        port: &midir::MidiOutputPort,
+        port_name: &str,
+    ) -> midir::MidiOutputConnection {
+        self.inner
+            .try_borrow_mut()
+            .map(|mut x| x.connect_output(port, port_name))
             .unwrap()
     }
 
