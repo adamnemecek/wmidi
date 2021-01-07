@@ -7,7 +7,7 @@ use crate::{
 
 enum MIDIOutputImpl {
     Port(midir::MidiOutputPort),
-    Connection(midir::MidiOutputConnection),
+    Connection(midir::MidiOutputPort, midir::MidiOutputConnection),
 }
 
 impl MIDIOutputImpl {
@@ -15,9 +15,19 @@ impl MIDIOutputImpl {
         match self {
             Self::Port(port) => {
                 let conn = output.connect(&port, port_name).unwrap();
-                self = Self::Connection(conn);
+                self = Self::Connection(port, conn);
             }
-            _ => { }
+            _ => {}
+        }
+    }
+
+    fn close(mut self) {
+        match self {
+            Self::Connection(port, conn) => {
+                let _output = conn.close();
+                self = Self::Port(port);
+            }
+            _ => {}
         }
     }
 }
@@ -38,7 +48,7 @@ impl MIDIOutput {
     }
 
     fn close(&mut self) {
-
+        todo!()
     }
 }
 
