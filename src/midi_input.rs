@@ -77,10 +77,7 @@ impl MIDIPort for MIDIInput {
     fn open(&mut self) {
         match self.connection {
             None => {
-                // self.
-                // let z = self.client.connect_input();
                 let on_midi_message = self.on_midi_message.as_ref().unwrap().clone();
-                (on_midi_message.inner)(MIDIPacket {});
                 self.connection = Some(self.client.connect_input(
                     0,
                     move |x, b, z| (on_midi_message.inner)(MIDIPacket {}),
