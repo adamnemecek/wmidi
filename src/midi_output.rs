@@ -3,6 +3,7 @@ use crate::{
     MIDIPortConnectionState,
     MIDIPortDeviceState,
     MIDIPortKind,
+    MIDIClient,
 };
 
 enum MIDIOutputImpl {
@@ -11,7 +12,7 @@ enum MIDIOutputImpl {
 }
 
 impl MIDIOutputImpl {
-    fn connect(mut self, port_name: &str, output: midir::MidiOutput) {
+    fn open(mut self, port_name: &str, output: midir::MidiOutput) {
         match self {
             Self::Port(port) => {
                 let conn = output.connect(&port, port_name).unwrap();
@@ -30,11 +31,24 @@ impl MIDIOutputImpl {
             _ => {}
         }
     }
+
+    fn send(&mut self, message: &[u8]) {
+        match self {
+            Self::Connection(_, conn) => {
+                conn.send(message);
+            }
+            _ => todo!(),
+        }
+    }
 }
 
+// #[]
 pub struct MIDIOutput {
-    inner: midir::MidiOutput,
-    connection: Option<midir::MidiOutputConnection>,
+    client: MIDIClient,
+    name: String,
+    imp: MIDIOutputImpl
+    // inner: midir::MidiOutput,
+    // connection: Option<midir::MidiOutputConnection>,
 }
 
 impl MIDIOutput {
@@ -44,10 +58,7 @@ impl MIDIOutput {
 
     // func send<S: Sequence>(_ data: S, offset: Timestamp = 0) -> MIDIOutput where S.Iterator.Element == UInt8
     pub fn send(&self, message: &[u8]) {
-        todo!()
-    }
-
-    fn close(&mut self) {
+        // self.imp.open();
         todo!()
     }
 }
@@ -82,11 +93,12 @@ impl MIDIPort for MIDIOutput {
 
     /// .open | .closed
     fn connection(&self) -> MIDIPortConnectionState {
-        if self.connection.is_none() {
-            MIDIPortConnectionState::Closed
-        } else {
-            MIDIPortConnectionState::Open
-        }
+        // if self.connection.is_none() {
+        //     MIDIPortConnectionState::Closed
+        // } else {
+        //     MIDIPortConnectionState::Open
+        // }
+        todo!()
     }
 
     /// open the port, is called implicitly when MIDIInput's onMIDIMessage is set or MIDIOutputs' send is called
@@ -96,6 +108,7 @@ impl MIDIPort for MIDIOutput {
 
     /// closes the port
     fn close(&mut self) {
+        // self.imp.close()
         todo!()
     }
 }
