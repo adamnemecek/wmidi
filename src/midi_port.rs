@@ -11,6 +11,7 @@ pub enum MIDIPortConnectionState {
     Open,
     Closed,
 }
+
 pub trait MIDIPort {
     fn id(&self) -> i32;
     fn manufacturer(&self) -> &str;

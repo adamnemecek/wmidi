@@ -6,6 +6,17 @@ use crate::{
 };
 pub struct MIDIOutput {
     inner: midir::MidiOutput,
+    connection: midir::MidiOutputConnection,
+}
+
+impl MIDIOutput {
+    fn new(inner: midir::MidiOutput, connection: midir::MidiOutputConnection) -> Self {
+        todo!()
+    }
+
+    pub fn send(&self) {
+        todo!()
+    }
 }
 
 impl MIDIPort for MIDIOutput {
@@ -47,5 +58,7 @@ impl MIDIPort for MIDIOutput {
     }
 
     /// closes the port
-    fn close(&mut self) {}
+    fn close(&mut self) {
+        todo!()
+    }
 }
