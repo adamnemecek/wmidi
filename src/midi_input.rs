@@ -18,7 +18,6 @@ struct OnMIDIMessageFn {
     pub inner: OnMIDIMessage,
 }
 
-
 impl OnMIDIMessageFn {
     fn new(inner: OnMIDIMessage) -> Self {
         Self { inner }

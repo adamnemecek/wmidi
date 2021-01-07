@@ -25,14 +25,21 @@ impl MIDIClientImpl {
     where
         F: FnMut(u64, &[u8], &mut ()) + Send + 'static,
     {
-
         let mut input = midir::MidiInput::new(&self.name).unwrap();
         std::mem::swap(&mut self.inputs, &mut input);
-        // let inputs = self.inner.borrow_mut().inputs;
-
-
         let res = input.connect(port, port_name, callback, ());
-        todo!()
+        res.unwrap()
+    }
+
+    fn connect_output(
+        &mut self,
+        port: &midir::MidiOutputPort,
+        port_name: &str,
+    ) -> midir::MidiOutputConnection {
+        let mut output = midir::MidiOutput::new(&self.name).unwrap();
+        std::mem::swap(&mut self.outputs, &mut output);
+        let res = output.connect(port, port_name);
+        res.unwrap()
     }
 }
 
@@ -48,7 +55,6 @@ impl std::ops::DerefMut for MIDIClientImpl {
         todo!()
     }
 }
-
 
 pub(crate) struct MIDIClient {
     inner: std::rc::Rc<RefCell<MIDIClientImpl>>,
@@ -70,18 +76,10 @@ impl MIDIClient {
     where
         F: FnMut(u64, &[u8], &mut ()) + Send + 'static,
     {
-        unsafe {
-            // std::mem::
-        }
-        // use std::pin::Pin;
-        // let mut inputs = self.inner;
-        // self.inner.connect(p)
-        // inputs.connect(port, port_name, callback, ());
-        // unsafe {
-            // let mut_ref: Pin<&mut Self> = Pin::as_mut(&mut self);
-            // Pin::get_unchecked_mut(mut_ref).slice = slice;
-        // }
-        todo!()
+        self.inner
+            .try_borrow_mut()
+            .map(|mut x| x.connect_input(port, callback, port_name))
+            .unwrap()
     }
 
     // pub(crate) fn connect_output(
