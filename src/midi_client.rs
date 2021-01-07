@@ -1,16 +1,38 @@
 use std::cell::RefCell;
 
 struct MIDIClientImpl {
-    pub(crate) inputs: midir::MidiInput,
+    name: String,
+    inputs: midir::MidiInput,
     outputs: midir::MidiOutput,
 }
 
 impl MIDIClientImpl {
     fn new(name: &str) -> Self {
         Self {
+            name: name.to_string(),
             inputs: midir::MidiInput::new(name).unwrap(),
             outputs: midir::MidiOutput::new(name).unwrap(),
         }
+    }
+
+    fn connect_input<F>(
+        &mut self,
+        port: &midir::MidiInputPort,
+        // input: usize,
+        callback: F,
+        port_name: &str,
+    ) -> midir::MidiInputConnection<()>
+    where
+        F: FnMut(u64, &[u8], &mut ()) + Send + 'static,
+    {
+
+        let mut input = midir::MidiInput::new(&self.name).unwrap();
+        std::mem::swap(&mut self.inputs, &mut input);
+        // let inputs = self.inner.borrow_mut().inputs;
+
+
+        let res = input.connect(port, port_name, callback, ());
+        todo!()
     }
 }
 
@@ -48,7 +70,9 @@ impl MIDIClient {
     where
         F: FnMut(u64, &[u8], &mut ()) + Send + 'static,
     {
-        // let inputs = &mut self.inner.get_mut().inputs;
+        unsafe {
+            // std::mem::
+        }
         // use std::pin::Pin;
         // let mut inputs = self.inner;
         // self.inner.connect(p)
