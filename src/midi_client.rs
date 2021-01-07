@@ -25,8 +25,9 @@ impl MIDIClient {
     }
 
     pub(crate) fn connect_input<F>(
-        self,
-        port: &midir::MidiInputPort,
+        &mut self,
+        // port: &midir::MidiInputPort,
+        input: usize,
         callback: F,
         port_name: &str,
     ) -> midir::MidiInputConnection<()>

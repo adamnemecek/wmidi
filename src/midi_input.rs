@@ -6,9 +6,13 @@ use crate::{
     MIDIPortKind,
 };
 
+#[derive(Clone, Copy)]
 pub struct MIDIPacket {}
 
-type OnMIDIMessage = Box<dyn Fn(MIDIPacket) -> ()>;
+unsafe impl Send for MIDIPacket {}
+unsafe impl Sync for MIDIPacket {}
+
+type OnMIDIMessage = std::sync::Arc<dyn Fn(MIDIPacket) -> ()>;
 pub struct MIDIInput {
     client: MIDIClient,
     inner: midir::MidiInput,
@@ -68,7 +72,14 @@ impl MIDIPort for MIDIInput {
             None => {
                 // self.
                 // let z = self.client.connect_input();
-                // self.connection = Some(self.client.connect_input(port, callback, port_name));
+                // let on_midi_message = self.on_midi_message.unwrap().clone();
+                self.connection = Some(self.client.connect_input(
+                    0,
+                    |x, b, z| {
+                        // on_midi_message(MIDIPacket{})
+                    },
+                    "cz",
+                ));
             }
             _ => {}
         }
