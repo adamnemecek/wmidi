@@ -14,6 +14,7 @@ impl MIDIOutput {
         todo!()
     }
 
+    // func send<S: Sequence>(_ data: S, offset: Timestamp = 0) -> MIDIOutput where S.Iterator.Element == UInt8
     pub fn send(&self) {
         todo!()
     }

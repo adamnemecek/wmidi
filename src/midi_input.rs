@@ -75,18 +75,14 @@ impl MIDIPort for MIDIInput {
 
     /// open the port, is called implicitly when MIDIInput's onMIDIMessage is set or MIDIOutputs' send is called
     fn open(&mut self) {
-        match self.connection {
-            None => {
-                let on_midi_message = self.on_midi_message.as_ref().unwrap().clone();
-                self.connection = Some(self.client.connect_input(
-                    0,
-                    move |x, b, z| (on_midi_message.inner)(MIDIPacket {}),
-                    "cz",
-                ));
-            }
-            _ => {}
+        if self.connection.is_none() {
+            let on_midi_message = self.on_midi_message.as_ref().unwrap().clone();
+            self.connection = Some(self.client.connect_input(
+                0,
+                move |x, b, z| (on_midi_message.inner)(MIDIPacket {}),
+                "cz",
+            ));
         }
-        todo!()
     }
 
     /// closes the port
