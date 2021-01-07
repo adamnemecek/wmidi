@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 
 struct MIDIClientImpl {
-    inputs: midir::MidiInput,
+    pub(crate) inputs: midir::MidiInput,
     outputs: midir::MidiOutput,
 }
 
@@ -14,9 +14,23 @@ impl MIDIClientImpl {
     }
 }
 
-#[derive(Clone)]
+impl std::ops::Deref for MIDIClientImpl {
+    type Target = midir::MidiInput;
+    fn deref(&self) -> &Self::Target {
+        todo!()
+    }
+}
+impl std::ops::DerefMut for MIDIClientImpl {
+    // type Target = midir::MidiInput;
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        todo!()
+    }
+}
+
+
 pub(crate) struct MIDIClient {
     inner: std::rc::Rc<RefCell<MIDIClientImpl>>,
+    // inner: std::pin::Pin<MIDIClientImpl>,
 }
 
 impl MIDIClient {
@@ -26,16 +40,23 @@ impl MIDIClient {
 
     pub(crate) fn connect_input<F>(
         &mut self,
-        // port: &midir::MidiInputPort,
-        input: usize,
+        port: &midir::MidiInputPort,
+        // input: usize,
         callback: F,
         port_name: &str,
     ) -> midir::MidiInputConnection<()>
     where
         F: FnMut(u64, &[u8], &mut ()) + Send + 'static,
     {
-        // let mut inputs = self.inner.borrow_mut().take();
+        // let inputs = &mut self.inner.get_mut().inputs;
+        // use std::pin::Pin;
+        // let mut inputs = self.inner;
+        // self.inner.connect(p)
         // inputs.connect(port, port_name, callback, ());
+        // unsafe {
+            // let mut_ref: Pin<&mut Self> = Pin::as_mut(&mut self);
+            // Pin::get_unchecked_mut(mut_ref).slice = slice;
+        // }
         todo!()
     }
 

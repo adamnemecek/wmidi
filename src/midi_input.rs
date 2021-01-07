@@ -28,7 +28,7 @@ unsafe impl Send for OnMIDIMessageFn {}
 unsafe impl Sync for OnMIDIMessageFn {}
 pub struct MIDIInput {
     client: MIDIClient,
-    inner: midir::MidiInput,
+    port: midir::MidiInputPort,
     connection: Option<midir::MidiInputConnection<()>>,
     // var onMIDIMessage: ((MIDIPacket) -> ())? = nil { get set }
     on_midi_message: Option<OnMIDIMessageFn>,
@@ -89,7 +89,7 @@ impl MIDIPort for MIDIInput {
         if self.connection.is_none() {
             let on_midi_message = self.on_midi_message.as_ref().unwrap().clone();
             self.connection = Some(self.client.connect_input(
-                0,
+                &self.port,
                 move |x, b, z| (on_midi_message.inner)(MIDIPacket {}),
                 "cz",
             ));

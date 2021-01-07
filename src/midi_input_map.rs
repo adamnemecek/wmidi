@@ -1,3 +1,7 @@
-pub struct MIDIInputMap {}
+pub struct MIDIInputMap {
+    
+}
 
-impl MIDIInputMap {}
+impl MIDIInputMap {
+
+}
