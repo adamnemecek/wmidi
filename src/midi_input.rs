@@ -12,7 +12,14 @@ pub struct MIDIPacket {}
 unsafe impl Send for MIDIPacket {}
 unsafe impl Sync for MIDIPacket {}
 
-type OnMIDIMessage = std::sync::Arc<dyn Fn(MIDIPacket) -> ()>;
+// type OnMIDIMessage = std::sync::Arc<dyn Fn(MIDIPacket) -> ()>;
+#[derive(Clone)]
+pub struct OnMIDIMessage {
+    pub inner: std::sync::Arc<dyn Fn(MIDIPacket) -> ()>,
+}
+
+unsafe impl Send for OnMIDIMessage {}
+unsafe impl Sync for OnMIDIMessage {}
 pub struct MIDIInput {
     client: MIDIClient,
     inner: midir::MidiInput,
@@ -72,12 +79,11 @@ impl MIDIPort for MIDIInput {
             None => {
                 // self.
                 // let z = self.client.connect_input();
-                // let on_midi_message = self.on_midi_message.unwrap().clone();
+                let on_midi_message = self.on_midi_message.as_ref().unwrap().clone();
+                (on_midi_message.inner)(MIDIPacket {});
                 self.connection = Some(self.client.connect_input(
                     0,
-                    |x, b, z| {
-                        // on_midi_message(MIDIPacket{})
-                    },
+                    move |x, b, z| (on_midi_message.inner)(MIDIPacket {}),
                     "cz",
                 ));
             }
