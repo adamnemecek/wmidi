@@ -1,28 +1,29 @@
-
 use crate::{
     MIDIPort,
     MIDIPortConnectionState,
     MIDIPortDeviceState,
     MIDIPortKind,
 };
-pub struct MIDIOutput {}
+pub struct MIDIOutput {
+    inner: midir::MidiOutput,
+}
 
 impl MIDIPort for MIDIOutput {
     fn id(&self) -> i32 {
         todo!()
     }
 
-    fn manufacturer(&self) -> String {
+    fn manufacturer(&self) -> &str {
         todo!()
     }
 
-    fn name(&self) -> String {
+    fn name(&self) -> &str {
         todo!()
     }
 
     /// .input (for MIDIInput) or .output (for MIDIOutput)
     fn kind(&self) -> MIDIPortKind {
-        todo!()
+        MIDIPortKind::Output
     }
 
     fn version(&self) -> u32 {
@@ -46,7 +47,5 @@ impl MIDIPort for MIDIOutput {
     }
 
     /// closes the port
-    fn close(&mut self) {
-        todo!()
-    }
+    fn close(&mut self) {}
 }

@@ -1,12 +1,21 @@
-pub enum MIDIPortKind {}
-pub enum MIDIPortDeviceState {}
+pub enum MIDIPortKind {
+    Input,
+    Output,
+}
+pub enum MIDIPortDeviceState {
+    Connected,
+    Disconnected,
+}
 
-pub enum MIDIPortConnectionState {}
+pub enum MIDIPortConnectionState {
+    Open,
+    Closed,
+}
 pub trait MIDIPort {
     fn id(&self) -> i32;
-    fn manufacturer(&self) -> String;
+    fn manufacturer(&self) -> &str;
 
-    fn name(&self) -> String;
+    fn name(&self) -> &str;
 
     /// .input (for MIDIInput) or .output (for MIDIOutput)
     fn kind(&self) -> MIDIPortKind;
