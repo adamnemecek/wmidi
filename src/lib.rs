@@ -9,4 +9,3 @@ pub use midi_output::*;
 
 mod midi_input;
 pub use midi_input::*;
-
