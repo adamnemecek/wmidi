@@ -1,43 +1,64 @@
 use crate::{
+    MIDIClient,
     MIDIPort,
     MIDIPortConnectionState,
     MIDIPortDeviceState,
     MIDIPortKind,
-    MIDIClient,
 };
 
+pub type RcRefCell<T> = std::rc::Rc<std::cell::RefCell<T>>;
+
+fn RcRefCell<T>(v: T) -> RcRefCell<T> {
+    std::rc::Rc::new(std::cell::RefCell::new(v))
+}
+
 enum MIDIOutputImpl {
-    Port(midir::MidiOutputPort),
-    Connection(midir::MidiOutputPort, midir::MidiOutputConnection),
+    Port(RcRefCell<midir::MidiOutputPort>),
+    Connection(
+        RcRefCell<midir::MidiOutputPort>,
+        RcRefCell<midir::MidiOutputConnection>,
+    ),
 }
 
 impl MIDIOutputImpl {
-    fn open(mut self, port_name: &str, output: midir::MidiOutput) {
+    fn open(self, port_name: &str, output: midir::MidiOutput) -> Self {
         match self {
             Self::Port(port) => {
-                let conn = output.connect(&port, port_name).unwrap();
-                self = Self::Connection(port, conn);
+                let conn = output.connect(&port.borrow(), port_name).unwrap();
+                Self::Connection(port, RcRefCell(conn))
             }
-            _ => {}
+            Self::Connection(port, conn) => Self::Connection(port, conn),
         }
     }
 
-    fn close(mut self) {
+    fn close(self) -> Self {
         match self {
             Self::Connection(port, conn) => {
-                let _output = conn.close();
-                self = Self::Port(port);
+                // let _output = conn.get_mut().close();
+                // conn.close();
+                // conn.clone().borrow().close();
+                todo!();
+
+                Self::Port(port)
             }
-            _ => {}
+            Self::Port(port) => Self::Port(port),
         }
     }
 
     fn send(&mut self, message: &[u8]) {
         match self {
             Self::Connection(_, conn) => {
-                conn.send(message);
+                conn.borrow_mut().send(message);
+                // conn.send(message);
             }
             _ => todo!(),
+        }
+    }
+
+    fn connection(&self) -> MIDIPortConnectionState {
+        match self {
+            Self::Port(_) => MIDIPortConnectionState::Closed,
+            Self::Connection(_, _) => MIDIPortConnectionState::Open,
         }
     }
 }
@@ -46,9 +67,8 @@ impl MIDIOutputImpl {
 pub struct MIDIOutput {
     client: MIDIClient,
     name: String,
-    imp: MIDIOutputImpl
-    // inner: midir::MidiOutput,
-    // connection: Option<midir::MidiOutputConnection>,
+    imp: MIDIOutputImpl, // inner: midir::MidiOutput,
+                         // connection: Option<midir::MidiOutputConnection>
 }
 
 impl MIDIOutput {
@@ -60,6 +80,12 @@ impl MIDIOutput {
     pub fn send(&self, message: &[u8]) {
         // self.imp.open();
         todo!()
+    }
+
+    fn open1(&mut self, output: midir::MidiOutput) {
+        // let output: midir::MidiOutput = todo!();
+        // self.imp = self.imp.open(&self.name, output);
+        // todo!()
     }
 }
 
@@ -73,7 +99,7 @@ impl MIDIPort for MIDIOutput {
     }
 
     fn name(&self) -> &str {
-        todo!()
+        &self.name
     }
 
     /// .input (for MIDIInput) or .output (for MIDIOutput)
@@ -98,17 +124,19 @@ impl MIDIPort for MIDIOutput {
         // } else {
         //     MIDIPortConnectionState::Open
         // }
-        todo!()
+        self.imp.connection()
     }
 
     /// open the port, is called implicitly when MIDIInput's onMIDIMessage is set or MIDIOutputs' send is called
     fn open(&mut self) {
-        todo!()
+        let output: midir::MidiOutput = todo!();
+        self.imp = self.imp.open(&self.name, output);
+        // todo!()
     }
 
     /// closes the port
     fn close(&mut self) {
-        // self.imp.close()
+        // self.imp = self.imp.close()
         todo!()
     }
 }
